@@ -8,7 +8,7 @@ import java.util.List;
  * Graphical interface for the Library Book Management System.
  * Provides controls for managing books using Java Swing.
  *
- * @author Tayyab Zia & Mursaleen Ahmad
+ * @author Tayyab Zia and Mursaleen Ahmad
  */
 public class LibraryGUI extends JFrame {
 
