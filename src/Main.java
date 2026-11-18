@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 /**
  * Entry point for the Library Book Management System.
  *
- * @author Library Management Team
+ * @author Tayyab Zia & Mursaleen Ahmad
  */
 public class Main {
 

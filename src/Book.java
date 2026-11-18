@@ -2,7 +2,7 @@
 /**
  * Represents a book in the Library Management System.
  *
- * @author Library Management Team
+ * @author Tayyab Zia & Mursaleen Ahmad
  */
 public class Book {
 

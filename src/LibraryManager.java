@@ -7,7 +7,7 @@ import java.util.List;
  * Supports adding, viewing, updating, deleting,
  * and changing the status of books.
  *
- * @author Library Management Team
+ * @author Tayyab Zia & Mursaleen Ahmad
  */
 public class LibraryManager {
 
