@@ -1,4 +1,5 @@
 
+import java.io.UncheckedIOException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -23,7 +24,8 @@ public class LibraryGUI extends JFrame {
     private DefaultTableModel tableModel;
 
     /**
-     * Initializes and displays the library GUI.
+     * Initializes the library GUI and loads saved books
+     * through LibraryManager.
      */
     public LibraryGUI() {
         manager = new LibraryManager();
@@ -60,7 +62,9 @@ public class LibraryGUI extends JFrame {
             BorderFactory.createEmptyBorder(10, 20, 20, 20)
         );
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel formPanel = new JPanel(
+            new GridLayout(4, 2, 10, 10)
+        );
 
         idField = new JTextField();
         titleField = new JTextField();
@@ -96,17 +100,24 @@ public class LibraryGUI extends JFrame {
         buttonPanel.add(statusButton);
         buttonPanel.add(clearButton);
 
-        JPanel topPanel = new JPanel(new BorderLayout(10, 10));
+        JPanel topPanel = new JPanel(
+            new BorderLayout(10, 10)
+        );
+
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "Title", "Author", "Status"};
+        String[] columns = {
+            "ID", "Title", "Author", "Status"
+        };
 
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(
+                int row, int column
+            ) {
                 return false;
             }
         };
@@ -134,21 +145,25 @@ public class LibraryGUI extends JFrame {
         clearButton.addActionListener(e -> clearFields());
 
         // Populate fields when a row is selected
-        bookTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                populateSelectedBook();
-            }
-        });
+        bookTable.getSelectionModel()
+            .addListSelectionListener(e -> {
+                if (!e.getValueIsAdjusting()) {
+                    populateSelectedBook();
+                }
+            });
     }
 
     /**
-     * Reads and validates the ID field.
+     * Reads and validates the book ID field.
      *
      * @return the entered book ID
+     * @throws IllegalArgumentException if the ID is not numeric
      */
     private int readBookId() {
         try {
-            return Integer.parseInt(idField.getText().trim());
+            return Integer.parseInt(
+                idField.getText().trim()
+            );
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(
                 "Please enter a valid numeric Book ID."
@@ -157,7 +172,7 @@ public class LibraryGUI extends JFrame {
     }
 
     /**
-     * Adds a new book to the library.
+     * Adds a book and displays any validation or storage errors.
      */
     private void addBook() {
         try {
@@ -176,11 +191,16 @@ public class LibraryGUI extends JFrame {
 
         } catch (IllegalArgumentException ex) {
             showError(ex.getMessage());
+
+        } catch (UncheckedIOException ex) {
+            showError(
+                "File storage error: " + ex.getMessage()
+            );
         }
     }
 
     /**
-     * Updates the title and author of an existing book.
+     * Updates book information and handles storage errors.
      */
     private void updateBook() {
         try {
@@ -202,11 +222,17 @@ public class LibraryGUI extends JFrame {
 
         } catch (IllegalArgumentException ex) {
             showError(ex.getMessage());
+
+        } catch (UncheckedIOException ex) {
+            showError(
+                "File storage error: " + ex.getMessage()
+            );
         }
     }
 
     /**
-     * Deletes an existing book after user confirmation.
+     * Deletes an existing book after confirmation
+     * and handles file storage errors.
      */
     private void deleteBook() {
         try {
@@ -225,19 +251,28 @@ public class LibraryGUI extends JFrame {
             );
 
             if (confirm == JOptionPane.YES_OPTION) {
+
                 manager.deleteBook(id);
+
                 refreshTable();
                 clearFields();
+
                 showMessage("Book deleted successfully!");
             }
 
         } catch (IllegalArgumentException ex) {
             showError(ex.getMessage());
+
+        } catch (UncheckedIOException ex) {
+            showError(
+                "File storage error: " + ex.getMessage()
+            );
         }
     }
 
     /**
-     * Changes the status of a book.
+     * Updates the selected book's availability status
+     * and handles storage errors.
      */
     private void updateStatus() {
         try {
@@ -252,6 +287,7 @@ public class LibraryGUI extends JFrame {
             if (updated) {
                 refreshTable();
                 clearFields();
+
                 showMessage("Book status updated!");
             } else {
                 showError("Book not found!");
@@ -259,11 +295,16 @@ public class LibraryGUI extends JFrame {
 
         } catch (IllegalArgumentException ex) {
             showError(ex.getMessage());
+
+        } catch (UncheckedIOException ex) {
+            showError(
+                "File storage error: " + ex.getMessage()
+            );
         }
     }
 
     /**
-     * Displays the current book collection in the table.
+     * Refreshes the book table using the current collection.
      */
     private void refreshTable() {
         tableModel.setRowCount(0);
@@ -300,26 +341,30 @@ public class LibraryGUI extends JFrame {
         int modelRow =
             bookTable.convertRowIndexToModel(selectedRow);
 
-        Object idValue = tableModel.getValueAt(modelRow, 0);
+        Object idValue =
+            tableModel.getValueAt(modelRow, 0);
 
         if (!(idValue instanceof Integer)) {
             return;
         }
 
         idField.setText(idValue.toString());
+
         titleField.setText(
             tableModel.getValueAt(modelRow, 1).toString()
         );
+
         authorField.setText(
             tableModel.getValueAt(modelRow, 2).toString()
         );
+
         statusBox.setSelectedItem(
             tableModel.getValueAt(modelRow, 3)
         );
     }
 
     /**
-     * Clears all input fields.
+     * Clears the input fields and table selection.
      */
     private void clearFields() {
         idField.setText("");
@@ -330,7 +375,7 @@ public class LibraryGUI extends JFrame {
     }
 
     /**
-     * Displays a success or information message.
+     * Displays an information message.
      *
      * @param message text to display
      */

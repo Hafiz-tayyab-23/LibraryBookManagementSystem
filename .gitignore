@@ -12,3 +12,6 @@ target/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Local library data
+data/
